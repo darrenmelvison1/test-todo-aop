@@ -71,9 +71,10 @@ export default function Todo() {
                 onChange={() => toggleTodo(todo.id)}
                 className="mr-2 h-5 w-5"
               />
-              <span className={todo.completed ? 'line-through text-gray-500' : ''}>
-                {todo.text}
-              </span>
+              <span 
+                className={todo.completed ? 'line-through text-gray-500' : ''}
+                dangerouslySetInnerHTML={{ __html: todo.text }}
+              />
             </div>
             <button 
               onClick={() => deleteTodo(todo.id)}
