@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface TodoItem {
   id: number;
@@ -11,6 +11,15 @@ interface TodoItem {
 export default function Todo() {
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  // Simulating async storage
+  const saveTodos = async (updatedTodos: TodoItem[]) => {
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    // Simulate storing to localStorage or a backend
+    console.log('Saved todos:', updatedTodos);
+  };
 
   const addTodo = () => {
     if (input.trim() === '') return;
@@ -21,7 +30,18 @@ export default function Todo() {
       completed: false,
     };
     
+    // Race condition: setting state without waiting for the previous state update
+    setLoading(true);
+    
+    // First state update
     setTodos([...todos, newTodo]);
+    
+    // Save todos - potential race condition since we're using todos which might not be updated yet
+    saveTodos(todos)
+      .finally(() => {
+        setLoading(false);
+      });
+    
     setInput('');
   };
 
