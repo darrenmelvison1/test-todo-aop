@@ -7,7 +7,7 @@ export default function Home() {
       <Todo />
       <div className="mt-4">
         <Link href="/dashboard" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-          Go to Dashboard (Bad Practices Demo)
+          Go to Dashboard (Extremely Bad Practices Demo)
         </Link>
       </div>
     </main>
