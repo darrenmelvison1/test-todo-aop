@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { trackEvent } from '../lib/analytics';
 
 interface TodoItem {
   id: number;
@@ -23,18 +24,41 @@ export default function Todo() {
     
     setTodos([...todos, newTodo]);
     setInput('');
+    
+    // Track the add todo event
+    trackEvent('todo_added', { todoId: newTodo.id, todoText: newTodo.text });
   };
 
   const toggleTodo = (id: number) => {
-    setTodos(
-      todos.map(todo => 
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
+    const updatedTodos = todos.map(todo => 
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
     );
+    
+    setTodos(updatedTodos);
+    
+    // Find the updated todo to get its new status
+    const updatedTodo = updatedTodos.find(todo => todo.id === id);
+    
+    // Track the toggle todo event
+    trackEvent('todo_toggled', { 
+      todoId: id, 
+      completed: updatedTodo?.completed,
+      todoText: updatedTodo?.text
+    });
   };
 
   const deleteTodo = (id: number) => {
+    // Find the todo before removing it for analytics
+    const todoToDelete = todos.find(todo => todo.id === id);
+    
     setTodos(todos.filter(todo => todo.id !== id));
+    
+    // Track the delete todo event
+    trackEvent('todo_deleted', { 
+      todoId: id,
+      todoText: todoToDelete?.text,
+      completed: todoToDelete?.completed
+    });
   };
 
   return (
