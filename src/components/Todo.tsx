@@ -52,7 +52,7 @@ export default function Todo() {
         />
         <button 
           onClick={addTodo}
-          className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600"
+          className="bg-blue-300 text-white px-4 py-2 rounded-r hover:bg-blue-400"
         >
           Add
         </button>
@@ -77,7 +77,7 @@ export default function Todo() {
             </div>
             <button 
               onClick={() => deleteTodo(todo.id)}
-              className="text-red-500 hover:text-red-700"
+              className="text-red-300 hover:text-red-400"
             >
               Delete
             </button>
