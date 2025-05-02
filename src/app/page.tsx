@@ -1,9 +1,5 @@
-import Todo from '../components/Todo';
+import { redirect } from 'next/navigation';
 
 export default function Home() {
-  return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-100">
-      <Todo />
-    </main>
-  );
+  redirect('/dashboard');
 }
