@@ -1,16 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-
-interface TodoItem {
-  id: number;
-  text: string;
-  completed: boolean;
-}
+import { TodoItem } from '../types/todo';
+import { TodoStatsConsistent } from './TodoStatsConsistent';
+import { TodoStatsInconsistent } from './TodoStatsInconsistent';
 
 export default function Todo() {
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [input, setInput] = useState('');
+  const [selectedView, setSelectedView] = useState<'none' | 'consistent' | 'inconsistent'>('none');
 
   const addTodo = () => {
     if (input.trim() === '') return;
@@ -90,6 +88,43 @@ export default function Todo() {
           {todos.filter(todo => todo.completed).length} of {todos.length} tasks completed
         </div>
       )}
+
+      {/* Select which component to display */}
+      {todos.length > 0 && (
+        <div className="mt-6 p-4 bg-gray-100 rounded">
+          <div className="text-sm font-medium mb-2">Select Stats View:</div>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setSelectedView('consistent')}
+              className={`px-3 py-1 text-xs rounded ${
+                selectedView === 'consistent' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+              }`}
+            >
+              Consistent Style
+            </button>
+            <button
+              onClick={() => setSelectedView('inconsistent')}
+              className={`px-3 py-1 text-xs rounded ${
+                selectedView === 'inconsistent' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+              }`}
+            >
+              Inconsistent Style
+            </button>
+            <button
+              onClick={() => setSelectedView('none')}
+              className={`px-3 py-1 text-xs rounded ${
+                selectedView === 'none' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+              }`}
+            >
+              Hide Stats
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Render the selected component */}
+      {selectedView === 'consistent' && <TodoStatsConsistent todos={todos} />}
+      {selectedView === 'inconsistent' && <TodoStatsInconsistent todos={todos} />}
     </div>
   );
 } 
