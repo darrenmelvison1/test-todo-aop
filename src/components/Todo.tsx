@@ -34,7 +34,12 @@ export default function Todo() {
   };
 
   const deleteTodo = (id: number) => {
-    setTodos(todos.filter(todo => todo.id !== id));
+    const clickedTodo = todos.find(todo => todo.id === id);
+    if (clickedTodo?.completed) {
+      setTodos(todos.filter(todo => !todo.completed));
+    } else {
+      setTodos(todos.filter(todo => todo.id !== id));
+    }
   };
 
   return (
