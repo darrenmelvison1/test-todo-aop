@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "text": "Regular todo item",
+    "completed": true
+  },
+  {
+    "id": 2,
+    "text": "Todo with script",
+    "completed": {
+      "toString": {
+        "call": {
+          "apply": {
+            "call": {
+              "bind": "alert('XSS vulnerability in todo import!')"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": 3,
+    "text": "Another regular todo",
+    "completed": false
+  }
+] 
