@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface TodoItem {
   id: number;
@@ -11,6 +11,17 @@ interface TodoItem {
 export default function Todo() {
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [input, setInput] = useState('');
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'c' && e.ctrlKey) {
+        console.log('Todos:', todos);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('resize', () => console.log('Window resized'));
+  }, [todos]);
 
   const addTodo = () => {
     if (input.trim() === '') return;
