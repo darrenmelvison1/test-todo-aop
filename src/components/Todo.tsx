@@ -1,12 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-
-interface TodoItem {
-  id: number;
-  text: string;
-  completed: boolean;
-}
+import { TodoStats } from './TodoStats';
+import { TodoItem } from '../types/todo';
 
 export default function Todo() {
   const [todos, setTodos] = useState<TodoItem[]>([]);
@@ -90,6 +86,9 @@ export default function Todo() {
           {todos.filter(todo => todo.completed).length} of {todos.length} tasks completed
         </div>
       )}
+
+      {/* Custom stats component */}
+      <TodoStats todos={todos} />
     </div>
   );
 } 
