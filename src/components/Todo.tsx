@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import useTodos from '../hooks/useTodos';
+import TodoFilters from './TodoFilters';
+import { truncateText } from '../utils/todoUtils';
 
 interface TodoItem {
   id: number;
@@ -8,34 +11,49 @@ interface TodoItem {
   completed: boolean;
 }
 
-export default function Todo() {
-  const [todos, setTodos] = useState<TodoItem[]>([]);
+function Todo() {
+  const { 
+    todos, 
+    filteredTodos,
+    isLoading, 
+    error, 
+    stats, 
+    addTodo, 
+    toggleTodo, 
+    deleteTodo,
+    filter,
+    setFilter
+  } = useTodos();
+  
   const [input, setInput] = useState('');
+  var [showStats, setShowStats] = useState(false);
 
-  const addTodo = () => {
+  const handleAddTodo = () => {
     if (input.trim() === '') return;
     
-    const newTodo: TodoItem = {
-      id: Date.now(),
-      text: input,
-      completed: false,
-    };
-    
-    setTodos([...todos, newTodo]);
+    addTodo(input);
     setInput('');
   };
 
-  const toggleTodo = (id: number) => {
-    setTodos(
-      todos.map(todo => 
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
-  };
+  function toggleStats() {
+    setShowStats(!showStats);
+  }
 
-  const deleteTodo = (id: number) => {
-    setTodos(todos.filter(todo => todo.id !== id));
-  };
+  if (isLoading) {
+    return (
+      <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
+        <p className="text-gray-500 text-center">Loading todos...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
+        <p className="text-red-500 text-center">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
@@ -46,50 +64,99 @@ export default function Todo() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && addTodo()}
+          onKeyPress={(e) => e.key === 'Enter' && handleAddTodo()}
           className="flex-grow px-4 py-2 border rounded-l focus:outline-none"
           placeholder="Add a new task..."
         />
         <button 
-          onClick={addTodo}
+          onClick={handleAddTodo}
           className="bg-blue-300 text-white px-4 py-2 rounded-r hover:bg-blue-400"
         >
           Add
         </button>
       </div>
       
-      <ul className="space-y-2">
-        {todos.map(todo => (
-          <li 
-            key={todo.id} 
-            className="flex items-center justify-between p-3 border rounded"
-          >
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                checked={todo.completed}
-                onChange={() => toggleTodo(todo.id)}
-                className="mr-2 h-5 w-5"
-              />
-              <span className={todo.completed ? 'line-through text-gray-500' : ''}>
-                {todo.text}
-              </span>
-            </div>
-            <button 
-              onClick={() => deleteTodo(todo.id)}
-              className="text-red-300 hover:text-red-400"
-            >
-              Delete
-            </button>
-          </li>
-        ))}
-      </ul>
+      <TodoFilters 
+        filter={filter}
+        onChange={setFilter}
+      />
       
-      {todos.length > 0 && (
-        <div className="mt-4 text-sm text-gray-500">
-          {todos.filter(todo => todo.completed).length} of {todos.length} tasks completed
+      <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between" }}>
+        <div className="text-sm font-medium">
+          {stats.total} tasks • {stats.completed} completed
         </div>
+        <button 
+          onClick={toggleStats}
+          className="text-xs text-blue-500 hover:text-blue-700"
+        >
+          {showStats ? "Hide" : "Show"} Stats
+        </button>
+      </div>
+      
+      {showStats && (
+        <div style={{
+          marginBottom: '16px',
+          padding: '12px',
+          backgroundColor: '#F9FAFB',
+          borderRadius: '6px',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+        }}>
+          <div style={{ marginBottom: '8px' }}>
+            <div style={{ height: '8px', backgroundColor: '#E5E7EB', borderRadius: '4px' }}>
+              <div 
+                style={{ 
+                  height: '100%', 
+                  width: `${stats.percentage}%`, 
+                  backgroundColor: '#3B82F6', 
+                  borderRadius: '4px',
+                  transition: 'width 0.3s ease'
+                }}
+              />
+            </div>
+            <div style={{ textAlign: 'center', fontSize: '12px', marginTop: '4px', color: '#6B7280' }}>
+              {stats.percentage}% Complete
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {filteredTodos.length === 0 ? (
+        <p style={{ textAlign: 'center', color: '#6B7280', padding: '16px' }}>
+          No matching tasks found
+        </p>
+      ) : (
+        <ul className="space-y-2">
+          {filteredTodos.map(todo => (
+            <li 
+              key={todo.id} 
+              className="flex items-center justify-between p-3 border rounded"
+            >
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={todo.completed}
+                  onChange={() => toggleTodo(todo.id)}
+                  className="mr-2 h-5 w-5"
+                />
+                <span 
+                  className={todo.completed ? 'line-through' : ''} 
+                  style={{ color: todo.completed ? '#9CA3AF' : '#111827' }}
+                >
+                  {truncateText(todo.text, 30)}
+                </span>
+              </div>
+              <button 
+                onClick={() => deleteTodo(todo.id)}
+                className="text-red-300 hover:text-red-400"
+              >
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
-} 
+}
+
+export default Todo; 
