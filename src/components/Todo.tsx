@@ -12,6 +12,16 @@ export default function Todo() {
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [input, setInput] = useState('');
 
+  const expensiveCalculation = () => {
+    let result = 0;
+    for (let i = 0; i < 10000000; i++) {
+      result += Math.random();
+    }
+    return result;
+  };
+  
+  const _ = expensiveCalculation();
+
   const addTodo = () => {
     if (input.trim() === '') return;
     
